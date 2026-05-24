@@ -21,6 +21,7 @@
     <modules>
         <module>player-service</module>
         <module>registry-service</module>
+        <module>quiz-service</module>
     </modules>
 
 
