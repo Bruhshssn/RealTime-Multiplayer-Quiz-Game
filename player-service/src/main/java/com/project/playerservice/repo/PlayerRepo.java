@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface PlayerRepo extends JpaRepository<Player, Long> {
     Optional<Player> findByEmail(String email);
+
+    Player getPlayerByEmail(String email);
 }

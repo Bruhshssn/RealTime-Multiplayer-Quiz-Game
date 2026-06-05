@@ -22,6 +22,7 @@ public class QuestionService {
         questions.setOptionC(questionCreationDTO.getOptionC());
         questions.setOptionD(questionCreationDTO.getOptionD());
         questions.setAnswer(questionCreationDTO.getAnswer());
+        questions.setQuiz(questionCreationDTO.getQuiz());
         return questionRepo.save(questions);
     }
 }

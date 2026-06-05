@@ -2,6 +2,7 @@ package com.project.playerservice.service;
 
 import com.project.playerservice.dto.LoginRequest;
 import com.project.playerservice.dto.RegisterRequest;
+import com.project.playerservice.dto.ResetPasswordDTO;
 import com.project.playerservice.entity.Player;
 import com.project.playerservice.repo.PlayerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,20 @@ public class PlayerService {
         Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(loginRequest.getEmail());
+            Player player = playerRepo.getPlayerByEmail(loginRequest.getEmail());
+            return jwtService.generateToken(player);
         }
         return "Failed to verify player";
+    }
+
+    public Player updatePassword(ResetPasswordDTO resetPasswordDTO) {
+        Player player = playerRepo.getPlayerByEmail(resetPasswordDTO.getEmail());
+
+        player.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+        return playerRepo.save(player);
+    }
+
+    public Player getPlayerById(Long id) {
+        return playerRepo.findById(id).get();
     }
 }

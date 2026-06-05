@@ -22,6 +22,8 @@
         <module>player-service</module>
         <module>registry-service</module>
         <module>quiz-service</module>
+        <module>API-gateway</module>
+        <module>room-service</module>
     </modules>
 
 

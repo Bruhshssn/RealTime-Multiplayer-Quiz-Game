@@ -1,0 +1,53 @@
+server:
+  port: 9000
+
+eureka:
+  client:
+
+    fetch-registry: true
+    register-with-eureka: true
+
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  main:
+    web-application-type: reactive
+
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+        - id: PLAYER-SERVICE
+          uri: lb://PLAYER-SERVICE
+          predicates:
+            - Path= /api/auth/**
+          filter: AuthenticationFilter
+
+        - id: QUIZ-SERVICE
+          uri: lb://QUIZ-SERVICE
+          predicates:
+            - Path= /api/quiz/**
+          filter: AuthenticationFilter
+
+        - id: ROOM-SERVICE
+          uri: lb://ROOM-SERVICE
+          predicates:
+            - Path= /api/rooms/**
+          filter: AuthenticationFilter
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.loadbalancer: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true

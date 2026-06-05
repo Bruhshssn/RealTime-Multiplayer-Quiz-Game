@@ -1,9 +1,12 @@
 package com.project.quizservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -20,17 +23,22 @@ public class Questions {
     private String question;
 
     @Column(nullable = false)
-    private String OptionA;
+    private String optionA;
 
     @Column(nullable = false)
-    private String OptionB;
+    private String optionB;
 
     @Column(nullable = false)
-    private String OptionC;
+    private String optionC;
 
     @Column(nullable = false)
-    private String OptionD;
+    private String optionD;
 
     @Column(nullable = false)
     private String answer;
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_id")
+    @JsonBackReference
+    private Quiz quiz;
 }
