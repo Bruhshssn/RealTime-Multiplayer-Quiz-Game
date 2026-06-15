@@ -24,6 +24,7 @@
         <module>quiz-service</module>
         <module>API-gateway</module>
         <module>room-service</module>
+        <module>leaderboard-service</module>
     </modules>
 
 

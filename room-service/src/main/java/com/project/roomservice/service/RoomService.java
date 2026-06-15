@@ -102,4 +102,10 @@ public class RoomService {
                 .filter(r -> r.getStatus() == GameRoom.RoomStatus.WAITING)
                 .toList();
     }
+
+    public void startQuiz(String roomId) {
+        GameRoom room = getRoom(roomId);
+        room.setStatus(GameRoom.RoomStatus.IN_PROGRESS);
+        roomRepository.save(room);
+    }
 }

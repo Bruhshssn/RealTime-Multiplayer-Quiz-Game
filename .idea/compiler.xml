@@ -19,6 +19,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="quiz-service" />
+        <module name="leaderboard-service" />
         <module name="player-service" />
       </profile>
     </annotationProcessing>
@@ -26,6 +27,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="API-gateway" options="-parameters" />
+      <module name="leaderboard-service" options="-parameters" />
       <module name="player-service" options="-parameters" />
       <module name="quiz-service" options="-parameters" />
       <module name="registry-service" options="-parameters" />

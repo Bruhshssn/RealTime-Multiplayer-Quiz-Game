@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,11 +29,10 @@ public class RoomController {
                 .getDetails();
     }
 
-    @PostMapping
+    @PostMapping("/createRoom")
     public ResponseEntity<GameRoom> createRoom(@RequestBody CreateRoomRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(roomService.createRoom(currentPlayerId(), currentPlayerName(),
-                        req.roomName(), req.maxPlayers())
-        );
+                        req.roomName(), req.maxPlayers()));
     }
 
     @PostMapping("/{roomId}/join")
@@ -58,6 +58,12 @@ public class RoomController {
     @GetMapping
     public ResponseEntity<List<GameRoom>> getOpenRooms() {
         return ResponseEntity.ok(roomService.getOpenRooms());
+    }
+
+    @PostMapping("/{roomId}/start")
+    public ResponseEntity<GameRoom> startQuiz(@PathVariable String roomId) {
+        roomService.startQuiz(roomId);
+        return ResponseEntity.ok().build();
     }
 
     // DTOs

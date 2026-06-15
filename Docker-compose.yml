@@ -1,0 +1,185 @@
+version: '3.8'
+
+services:
+  registry-service:
+    image: registry-service:latest
+    build:
+      context: ./registry-service
+      dockerfile: Dockerfile
+    container_name: registry-service
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gaming-network
+
+  player-mysql:
+    image: mysql:8.0
+    container_name: player-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: player_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - player-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - gaming-network
+
+  quiz-mysql:
+    image: mysql:8.0
+    container_name: quiz-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: quiz_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - quiz-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - gaming-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-container
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - gaming-network
+
+
+  api-gateway:
+    image: api-gateway:latest
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry-service:8761/eureka/
+    depends_on:
+      registry-service:
+        condition: service_healthy
+    networks:
+      - gaming-network
+
+  player-service:
+    image: player-service:latest
+    build:
+      context: ./player-service
+      dockerfile: Dockerfile
+    container_name: player-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://player-mysql:3306/player_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+    depends_on:
+      registry-service:
+        condition: service_healthy
+      player-mysql:
+        condition: service_healthy
+    networks:
+      - gaming-network
+
+  quiz-service:
+    image: quiz-service:latest
+    build:
+      context: ./quiz-service
+      dockerfile: Dockerfile
+    container_name: quiz-service
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry-service:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://quiz-mysql:3306/quiz_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=rootpassword
+    depends_on:
+      registry-service:
+        condition: service_healthy
+      quiz-mysql:
+        condition: service_healthy
+    networks:
+      - gaming-network
+
+  room-service:
+    image: room-service:latest
+    build:
+      context: ./room-service
+      dockerfile: Dockerfile
+    container_name: room-service
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry-service:8761/eureka/
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      registry-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gaming-network
+
+  leaderboard-service:
+    image: leaderboard-service:latest
+    build:
+      context: ./leaderboard-service
+      dockerfile: Dockerfile
+    container_name: leaderboard-service
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://registry-service:8761/eureka/
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      registry-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gaming-network
+
+
+
+networks:
+  gaming-network:
+    driver: bridge
+
+volumes:
+  player-mysql-data:
+  quiz-mysql-data:

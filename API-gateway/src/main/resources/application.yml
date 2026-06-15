@@ -13,12 +13,25 @@ eureka:
 spring:
   main:
     web-application-type: reactive
-
   application:
     name: API-GATEWAY
-
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
       routes:
         - id: PLAYER-SERVICE
           uri: lb://PLAYER-SERVICE
@@ -38,16 +51,14 @@ spring:
             - Path= /api/rooms/**
           filter: AuthenticationFilter
 
+        - id: LEADERBOARD-SERVICE
+          uri: lb://LEADERBOARD-SERVICE
+          predicates:
+            - Path= /api/leaderboard/**
+          filter: AuthenticationFilter
+
 logging:
   level:
     org.springframework.cloud.gateway: TRACE
     org.springframework.cloud.loadbalancer: DEBUG
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    gateway:
-      enabled: true

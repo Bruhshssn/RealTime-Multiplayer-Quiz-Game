@@ -17,7 +17,8 @@ public class Questions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Long questionId;
 
     @Column(nullable = false)
     private String question;
@@ -37,8 +38,4 @@ public class Questions {
     @Column(nullable = false)
     private String answer;
 
-    @ManyToOne
-    @JoinColumn(name = "quiz_id")
-    @JsonBackReference
-    private Quiz quiz;
 }

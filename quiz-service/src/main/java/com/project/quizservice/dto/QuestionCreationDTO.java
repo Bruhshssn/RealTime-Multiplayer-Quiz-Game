@@ -1,6 +1,5 @@
 package com.project.quizservice.dto;
 
-import com.project.quizservice.entity.Quiz;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +15,4 @@ public class QuestionCreationDTO {
     private String optionC;
     private String optionD;
     private String answer;
-    private Quiz quiz;
 }
